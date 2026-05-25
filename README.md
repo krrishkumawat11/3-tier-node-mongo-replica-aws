@@ -37,8 +37,8 @@ In this project, I built a **production-grade, fully containerized infrastructur
 
 ```
                          ┌─────────────────────────────────────────────┐
-                         │              Ubuntu Machine                  │
-                         │                                              │
+                         │              Ubuntu Machine                 │
+                         │                                             │
   Internet               │   ┌──────────────────────────────────────┐  │
   HTTP/HTTPS ──────────► │   │          Docker Engine               │  │
                          │   │                                      │  │
@@ -46,14 +46,14 @@ In this project, I built a **production-grade, fully containerized infrastructur
                          │   │  │   NGINX  (Port 80 / 443)       │  │  │
                          │   │  │   Reverse Proxy + SSL          │  │  │
                          │   │  └───────────────┬────────────────┘  │  │
-                         │   │                  │ proxy_pass         │  │
-                         │   │                  ▼                    │  │
+                         │   │                  │ proxy_pass        │  │
+                         │   │                  ▼                   │  │
                          │   │  ┌────────────────────────────────┐  │  │
                          │   │  │   Node.js App  (Port 3000)     │  │  │
                          │   │  │   Internal only                │  │  │
                          │   │  └───────────────┬────────────────┘  │  │
-                         │   │                  │ MONGO_URI          │  │
-                         │   │                  ▼                    │  │
+                         │   │                  │ MONGO_URI         │  │
+                         │   │                  ▼                   │  │
                          │   │  ┌────────────────────────────────┐  │  │
                          │   │  │    MongoDB Replica Set (rs0)   │  │  │
                          │   │  │  mongo1:5501  (Primary)        │  │  │
