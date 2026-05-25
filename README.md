@@ -35,42 +35,7 @@ In this project, I built a **production-grade, fully containerized infrastructur
 
 ## Architecture Diagram
 
-```
-                         ┌─────────────────────────────────────────────┐
-                         │              Ubuntu Machine                 │
-                         │                                             │
-  Internet               │   ┌──────────────────────────────────────┐  │
-  HTTP/HTTPS ──────────► │   │          Docker Engine               │  │
-                         │   │                                      │  │
-                         │   │  ┌────────────────────────────────┐  │  │
-                         │   │  │   NGINX  (Port 80 / 443)       │  │  │
-                         │   │  │   Reverse Proxy + SSL          │  │  │
-                         │   │  └───────────────┬────────────────┘  │  │
-                         │   │                  │ proxy_pass        │  │
-                         │   │                  ▼                   │  │
-                         │   │  ┌────────────────────────────────┐  │  │
-                         │   │  │   Node.js App  (Port 3000)     │  │  │
-                         │   │  │   Internal only                │  │  │
-                         │   │  └───────────────┬────────────────┘  │  │
-                         │   │                  │ MONGO_URI         │  │
-                         │   │                  ▼                   │  │
-                         │   │  ┌────────────────────────────────┐  │  │
-                         │   │  │    MongoDB Replica Set (rs0)   │  │  │
-                         │   │  │  mongo1:5501  (Primary)        │  │  │
-                         │   │  │  mongo2:5502  (Secondary)      │  │  │
-                         │   │  │  mongo3:5503  (Secondary)      │  │  │
-                         │   │  └────────────────────────────────┘  │  │
-                         │   │                                      │  │
-                         │   │  ┌──────────────────────────────┐    │  │
-                         │   │  │     Monitoring Stack         │    │  │
-                         │   │  │  Prometheus    :9090         │    │  │
-                         │   │  │  Grafana       :3001         │    │  │
-                         │   │  │  Node Exporter :9100         │    │  │
-                         │   │  │  Mongo Exporter:9216         │    │  │
-                         │   │  └──────────────────────────────┘    │  │
-                         │   └──────────────────────────────────────┘  │
-                         └─────────────────────────────────────────────┘
-```
+![Architecture Diagram](assets/architecture.png)
 
 All services communicate over a single internal Docker bridge network: `app-net`.
 
