@@ -57,18 +57,18 @@ Everything communicates over a private Docker bridge network — the Node.js app
 │                                                 │
 │  ┌───────────────────────────────────────────┐  │
 │  │         NGINX (Port 80 / 443)             │  │
-│  │  SSL: TLSv1.2 / TLSv1.3                  │  │
-│  │  Cert: techkrrish.crt + ca_bundle.crt    │  │
+│  │  SSL: TLSv1.2 / TLSv1.3                   │  │
+│  │  Cert: techkrrish.crt + ca_bundle.crt     │  │
 │  └──────────────────┬────────────────────────┘  │
-│                     │ proxy_pass                 │
-│                     ▼                            │
+│                     │ proxy_pass                │
+│                     ▼                           │
 │  ┌───────────────────────────────────────────┐  │
 │  │      Node.js App  (Internal :3000)        │  │
 │  │  Express + Mongoose + bcrypt              │  │
-│  │  Routes: GET /  POST /register  POST /login│ │
+│  │  Routes: GET /  POST /register POST /login│  │
 │  └──────────────────┬────────────────────────┘  │
-│                     │ MONGO_URI (replicaSet=rs0) │
-│                     ▼                            │
+│                     │ MONGO_URI (replicaSet=rs0)│
+│                     ▼                           │
 │  ┌───────────────────────────────────────────┐  │
 │  │       MongoDB Replica Set (rs0)           │  │
 │  │   mongo1:5501 ── Primary                  │  │
