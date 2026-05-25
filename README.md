@@ -45,8 +45,6 @@ Everything communicates over a private Docker bridge network — the Node.js app
 
 ## Architecture Diagram
 
-![Architecture Diagram](assets/architecture.png)
-
 ```
   techkrrish.online
         │
