@@ -1,0 +1,171 @@
+version: "3.8"
+services:
+  mongo1:
+    image: mongo:7
+    container_name: mongo1
+    command: ["mongod", "--config", "/etc/mongo.conf"]
+    volumes:
+      - ./mongo/mongo1.conf:/etc/mongo.conf
+      - ./mongo/keyfile:/etc/keyfile:ro
+      - ./data/mongo1:/data/db
+    ports:
+      - "5501:5501"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    networks:
+      - app-net
+
+  mongo2:
+    image: mongo:7
+    container_name: mongo2
+    command: ["mongod", "--config", "/etc/mongo.conf"]
+    volumes:
+      - ./mongo/mongo2.conf:/etc/mongo.conf
+      - ./mongo/keyfile:/etc/keyfile:ro
+      - ./data/mongo2:/data/db
+    ports:
+      - "5502:5502"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    networks:
+      - app-net
+
+  mongo3:
+    image: mongo:7
+    container_name: mongo3
+    command: ["mongod", "--config", "/etc/mongo.conf"]
+    volumes:
+      - ./mongo/mongo3.conf:/etc/mongo.conf
+      - ./mongo/keyfile:/etc/keyfile:ro
+      - ./data/mongo3:/data/db
+    ports:
+      - "5503:5503"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    networks:
+      - app-net
+
+  nodeapp:
+    build: ./nodeapp
+    container_name: nodeapp
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    environment:
+      MONGO_URI: mongodb://admin:admin123@mongo1:5501,mongo2:5502,mongo3:5503/appdb?replicaSet=rs0&authSource=admin
+    networks:
+      - app-net
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/html:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    depends_on:
+      - nodeapp
+    networks:
+      - app-net
+
+  # ─────────────────────────────────────────
+  # MONITORING STACK
+  # ─────────────────────────────────────────
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.40
+    container_name: mongo-exporter
+    environment:
+      - MONGODB_URI=mongodb://admin:admin123@mongo1:5501/admin?authSource=admin
+    command:
+      - '--discovering-mode'
+      - '--mongodb.global-conn-pool'
+      - '--collect-all'
+    ports:
+      - "9216:9216"
+    restart: always
+    depends_on:
+      - mongo1
+    networks:
+      - app-net
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    hostname: krrish-Ubuntu
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    restart: always
+    networks:
+      - app-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--storage.tsdb.retention.size=5GB"
+      - "--web.listen-address=0.0.0.0:9090"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    restart: always
+    depends_on:
+      - mongo-exporter
+      - node-exporter
+    networks:
+      - app-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - app-net
+
+volumes:
+  grafana-data:
+  prometheus-data:
+
+networks:
+  app-net:
+    driver: bridge

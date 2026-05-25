@@ -1,0 +1,37 @@
+# MongoDB data directories (WiredTiger files, journals, locks)
+data/
+data/mongo1/
+data/mongo2/
+data/mongo3/
+
+# MongoDB keyfile (sensitive — regenerate after cloning)
+mongo/keyfile
+
+# SSL certificates and private keys
+nginx/ssl/*.key
+nginx/ssl/*.crt
+nginx/ssl/*.pem
+
+# Backup and draft compose files
+backup.docker-compose.yaml
+doker-compose.yml
+latest.back.docker-compose.yml
+backup2.index.html
+backup.index.html
+mongo.expo.promo.grfana.compose.yaml
+monitoring/prometheus.conf
+monitoring/prom.yml
+
+# Node.js backups
+nodeapp/backup/
+nodeapp/backup.server.js
+
+# Nginx draft configs
+nginx/todo.nginx.conf
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.env
+*.swp
+*.swo
